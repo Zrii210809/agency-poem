@@ -23,5 +23,12 @@ POEM = (
 )
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-with open(os.path.join(OUTPUT_DIR, "entry.txt"), "w", encoding="utf-8", newline="") as f:
+# The competition requires 1-1000 characters; fail loudly instead of
+# submitting an out-of-range poem.
+assert 1 <= len(POEM) <= 1000, f"poem is {len(POEM)} characters"
+# Write atomically so a crash can never leave a partial entry.txt behind.
+path = os.path.join(OUTPUT_DIR, "entry.txt")
+tmp = path + ".tmp"
+with open(tmp, "w", encoding="utf-8", newline="") as f:
     f.write(POEM)
+os.replace(tmp, path)
